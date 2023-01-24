@@ -1,0 +1,70 @@
+***
+HELPFUL LINUX COMMANDS
+***
+
+
+~~~ MINOR REFERENCE ~~~
+-p 
+#Switch, does different things depending on context
+
+ls
+#'List'
+#'Lists all sub-directories in current directory
+
+\
+#Escape character
+
+
+~~~ NAVIGATION ~~~
+pwd
+#'Print working Directory'
+#Prints where the shell is currently operating, meaning where all 
+#operations and file manipulations take place
+
+cd {Your directory here}
+#'Change directory'
+#Changes the working directory for the shell
+
+cd /{Your directory here}
+#Absolute path
+#Switch to root directory
+
+cd ..
+#Go up to parent directory
+
+cd ~/{Your directory here}
+#Absoulte path rel to home
+#Starting from home directory, move to new location
+
+ls *{Your text here}
+#Find files with your text inside current directory
+
+
+~~~ FILE MANIPULATION ~~~
+mkdir {File a} {File b} {File c etc.}
+#'Make directory'
+#Makes a folder 
+
+mkdir /{directory}/{Your directory here}
+#'Make directory inside location
+
+mkdir -p dir4/dir5/dir6
+#Nested directores
+#Makes directory 4, then 5 insides of 4, and 6 inside of 5
+#So, dir4>dir5>dir6
+
+mkdir '{Your directory} {Second word}'
+#Make directory with space in namel
+
+cat {Your file}.txt {Your other file etc}.txt
+#'Concatenate'
+#Display file content
+
+cat >{filename}.txt
+{Your text here}
+#Create text file
+#First creates the file, then in a blank line awaits what you'll put in it
+
+cat test1.txt >> test3.txt
+#Append file content to another file
+ 
