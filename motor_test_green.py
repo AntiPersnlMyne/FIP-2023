@@ -1,4 +1,4 @@
-#this code turns the motor when the the camera detects a person. The window to show what the camera sees does not appear when running the code.
+#this code turns the motor in increments of 4 seconds.
 
 from __future__ import print_function
 import sys
