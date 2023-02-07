@@ -1,3 +1,5 @@
+#this is the old code to run object detection. This version won't work with the tf lite models and the new opencv configuration.
+
 import cv2
 
 #thres = 0.45 # Threshold to detect object
