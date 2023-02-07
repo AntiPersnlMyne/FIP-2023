@@ -1,0 +1,19 @@
+sudo raspi-config
+
+I2C / Enabled
+
+sudo reboot
+
+cd {Your project director}
+
+source {Environment}/bin/activate
+
+i2cdetect -y 1
+
+#Likely to tell you that the board is located at 0x10 in HorizontalxVertical coordinate
+
+sudo git clone https://github.com/DFRobot/DFRobot_RaspberryPi_Motor
+
+pip install catalogue
+
+cd /DFRobot_RaspberryPi_Motor/raspberry

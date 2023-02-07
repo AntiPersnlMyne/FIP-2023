@@ -1,0 +1,53 @@
+*** From birth to funtioning product ***
+Setup SSH keys, wifi, hostname, region, and 64 bit OS BEFORE flashing
+Optional to use SSH on windows to do all of this
+
+sudo apt update
+
+sudo apt full-upgrade \ {y}
+
+sudo reboot
+
+pip install protobuf==3.20
+
+sudo raspi-config \ Legacy Camera - Enabled \ reboot
+
+mkdir {Your project name here}
+
+cd {That project name}
+
+python3 -m pip install virtualenv
+
+python3 -m virtualenv {Your environment name here}
+
+source {envioronment_name}/bin/activate 
+
+# You the virtual environment henceforth to work on the project
+
+sudo apt-get install --yes libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libgdbm-dev lzma lzma-dev tcl-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev wget make openssl
+
+pyhon3 -m pip install tflite-runtime
+
+python3
+
+import tflite_runtime as tf
+
+# Good practice to refer to Tensorflow-Lite as tf
+
+tf.__version__
+
+'ctrl+d'
+
+pip install opencv-contrib-python
+
+pip install "picamera[array]"
+
+python3
+
+import cv2
+
+cv2.__version__
+
+Credit: SamWestbyTech
+
+
