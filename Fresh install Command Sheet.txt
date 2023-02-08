@@ -4,23 +4,23 @@ Optional to use SSH on windows to do all of this
 
 sudo apt update
 
-sudo apt full-upgrade \ {y}
+sudo apt full-upgrade =>> y
 
 sudo reboot
 
 pip install protobuf==3.20
 
-sudo raspi-config \ Legacy Camera - Enabled \ reboot
+sudo raspi-config =>> Interface Options ==> Legacy Camera ==> Enabled =>> reboot
 
-mkdir {Your project name here}
+mkdir FIPproj
 
-cd {That project name}
+cd FIPproj
 
 python3 -m pip install virtualenv
 
-python3 -m virtualenv {Your environment name here}
+python3 -m virtualenv fipenv
 
-source {envioronment_name}/bin/activate 
+source fipenv/bin/activate 
 
 # You the virtual environment henceforth to work on the project
 
