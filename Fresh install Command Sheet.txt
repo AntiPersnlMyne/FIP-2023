@@ -26,7 +26,7 @@ source fipenv/bin/activate
 
 sudo apt-get install --yes libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libgdbm-dev lzma lzma-dev tcl-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev wget make openssl
 
-pyhon3 -m pip install tflite-runtime
+python3 -m pip install tflite-runtime
 
 python3
 
@@ -36,7 +36,7 @@ import tflite_runtime as tf
 
 tf.__version__
 
-'ctrl+d'
+# Press 'ctrl+d'
 
 pip install opencv-contrib-python
 
