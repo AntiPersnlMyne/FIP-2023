@@ -45,7 +45,24 @@ def board_detection():
 
 def handle_exit():
   board.motor_stop(board.ALL)   #stop all DC motor
-
+  
+# @@@Direction controls@@@
+# Turns are not currently accurate. Must try different speed/time/without wires
+def go_straight():
+  board.motor_movement([1, 2], board.CW, 100)
+  time.sleep(2)
+def go_back():
+  board.motor_movement([1, 2], board.CCW, 100)
+  time.sleep(2)
+def turn_left():  
+  board.motor_movement([1], board.CW, 100)
+  board.motor_movement([2], board.CCW, 50)
+  time.sleep(1)  
+def turn_right():
+  board.motor_movement([2], board.CW, 100)
+  board.motor_movement([1], board.CCW, 50)
+  time.sleep(1)
+  
 
 # @@@@@ EXECUTION @@@@@@
 if __name__ == "__main__":
