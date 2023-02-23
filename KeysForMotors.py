@@ -67,10 +67,12 @@ def turn_right():
   
 #More new key controls
 actions = {
-    curses.KEY_UP:  cameraDown,
-    curses.KEY_DOWN:    cameraUp,
-    curses.KEY_LEFT:    cameraFront,
-    curses.KEY_RIGHT:   cameraFace,
+    curses.KEY_UP:  go_straight,
+    curses.KEY_DOWN:    go_back,
+    curses.KEY_LEFT:    turn_left,
+    curses.KEY_RIGHT:   turn_left,
+    curses.KEY_ESC: handle_exit,
+
 }
 
 
@@ -85,22 +87,22 @@ if __name__ == "__main__":
   
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(100)   # Set DC motor pwm frequency to 1000HZ
-  board.motor_movement([1, 2], board.CCW, 100)    # DC motor 1 movement, orientation clockwise
+  #board.motor_movement([1, 2], board.CCW, 100)    # DC motor 1 movement, orientation clockwise
   #ccw on both moves backwards
-  time.sleep(2)
-  board.motor_movement([1, 2], board.CW, 100)
+ # time.sleep(2)
+  #board.motor_movement([1, 2], board.CW, 100)
   #cw moves forward
-  time.sleep(2)
-  board.motor_movement([1], board.CW, 100)
-  board.motor_movement([2], board.CCW, 100)
+  #time.sleep(2)
+  #board.motor_movement([1], board.CW, 100)
+  #board.motor_movement([2], board.CCW, 100)
   #cw moves left
-  time.sleep(2)
-  board.motor_movement([2], board.CW, 100)
-  board.motor_movement([1], board.CCW, 100)
+  #time.sleep(2)
+  #board.motor_movement([2], board.CW, 100)
+  #board.motor_movement([1], board.CCW, 100)
   #cw moves right
-  time.sleep(2)
-  board.motor_stop(board.ALL)   #stop all DC motor
-  print_board_status()
+  #time.sleep(2)
+  #board.motor_stop(board.ALL)   #stop all DC motor
+  #print_board_status()
 
   def main(window):
     next_key = None
