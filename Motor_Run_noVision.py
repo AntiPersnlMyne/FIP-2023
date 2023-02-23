@@ -7,6 +7,7 @@ import time
 from DFRobot_RaspberryPi_DC_Motor import DFRobot_DC_Motor_IIC as Board
 import signal
 import atexit
+import msvcrt
 # IMPORTANT
 # Requires the library "DFRobot_RaspberryPi_DC_Motor" to be in the current working directory
 # That means in the same folder, or remove the commented sys.path for an adjustment
@@ -45,24 +46,39 @@ def board_detection():
 
 def handle_exit():
   board.motor_stop(board.ALL)   #stop all DC motor
-  
+
 # @@@Direction controls@@@
 # Turns are not currently accurate. Must try different speed/time/without wires
 def go_straight():
-  board.motor_movement([1, 2], board.CW, 100)
-  time.sleep(2)
+  board.motor_movement([1, 2], board.CW, 50)
+  time.sleep(0.5)
 def go_back():
-  board.motor_movement([1, 2], board.CCW, 100)
-  time.sleep(2)
+  board.motor_movement([1, 2], board.CCW, 50)
+  time.sleep(0.5)
 def turn_left():  
-  board.motor_movement([1], board.CW, 100)
-  board.motor_movement([2], board.CCW, 50)
-  time.sleep(1)  
+  board.motor_movement([1], board.CW, 50)
+  board.motor_movement([2], board.CCW, 00)
+  time.sleep(0.5)  
 def turn_right():
-  board.motor_movement([2], board.CW, 100)
-  board.motor_movement([1], board.CCW, 50)
-  time.sleep(1)
-  
+  board.motor_movement([2], board.CW, 50)
+  board.motor_movement([1], board.CCW, 00)
+  time.sleep(0.5)
+
+def rc_controls():
+  key = msvcrt.getch().lower()
+  if key == b'a':
+    print("a")
+  elif key == b'd':
+    print("d")
+  elif key == b'w':
+    print("w")
+  elif key == b's':
+    print("s")
+  elif key == b'q':
+    print("q")
+    board.motor_stop(board.all)
+    print_board_status()
+    
 
 # @@@@@ EXECUTION @@@@@@
 if __name__ == "__main__":
@@ -74,19 +90,5 @@ if __name__ == "__main__":
   
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(100)   # Set DC motor pwm frequency to 1000HZ
-  board.motor_movement([1, 2], board.CCW, 100)    # DC motor 1 movement, orientation clockwise
-  #ccw on both moves backwards
-  time.sleep(2)
-  board.motor_movement([1, 2], board.CW, 100)
-  #cw moves forward
-  time.sleep(2)
-  board.motor_movement([1], board.CW, 100)
-  board.motor_movement([2], board.CCW, 100)
-  #cw moves left
-  time.sleep(2)
-  board.motor_movement([2], board.CW, 100)
-  board.motor_movement([1], board.CCW, 100)
-  #cw moves right
-  time.sleep(2)
-  board.motor_stop(board.ALL)   #stop all DC motor
-  print_board_status()
+  while True:
+    rc_controls()
