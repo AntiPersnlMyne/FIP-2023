@@ -7,6 +7,7 @@ import time
 from DFRobot_RaspberryPi_DC_Motor import DFRobot_DC_Motor_IIC as Board
 import signal
 import atexit
+import keyboard
 # IMPORTANT
 # Requires the library "DFRobot_RaspberryPi_DC_Motor" to be in the current working directory
 # That means in the same folder, or remove the commented sys.path for an adjustment
@@ -55,12 +56,12 @@ def go_back():
   board.motor_movement([1, 2], board.CCW, 50)
   time.sleep(0.5)
 def turn_left():  
-  board.motor_movement([1], board.CW, 50)
-  board.motor_movement([2], board.CCW, 10)
+  board.motor_movement([1], board.CW, 60)
+  board.motor_movement([2], board.CCW, 40)
   time.sleep(0.5)  
 def turn_right():
-  board.motor_movement([2], board.CW, 50)
-  board.motor_movement([1], board.CCW, 10)
+  board.motor_movement([2], board.CW, 60)
+  board.motor_movement([1], board.CCW, 40)
   time.sleep(0.5)
 
 def rc_controls():
@@ -94,4 +95,20 @@ if __name__ == "__main__":
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(100)   # Set DC motor pwm frequency to 1000HZ
   while True:
-    rc_controls()
+    key = input('press key')
+    if key == 'a':
+      print("a is pressed")
+      turn_left()
+    elif key == 's':
+      print("s is pressed")
+      go_back()
+    elif key == 'w':
+      print("w is pressed")
+      go_straight()
+    elif key == 'd':
+      print("d is pressed")
+      turn_right()
+    elif key == 'q':
+      print("q is pressed")
+      board.motor_stop(board.all)
+      print_board_status()
