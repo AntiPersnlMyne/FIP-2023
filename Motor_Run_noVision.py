@@ -65,21 +65,21 @@ def turn_right():
   time.sleep(0.5)
 
 def rc_controls():
-  key = msvcrt.getch().lower()
-  if key == b'a':
-    print("a")
-  elif key == b'd':
-    print("d")
-  elif key == b'w':
-    print("w")
-  elif key == b's':
-    print("s")
-  elif key == b'q':
-    print("q")
+  key = input('press key')
+  if key == 'a':
+    print("a is pressed")
+  elif key == 'd':
+    print("d is pressed")
+  elif key == 'w':
+    print("w is pressed")
+  elif key == 's':
+    print("s is pressed")
+  elif key == 'q':
+    print("q is pressed")
     board.motor_stop(board.all)
     print_board_status()
     
-
+    
 # @@@@@ EXECUTION @@@@@@
 if __name__ == "__main__":
   # Register signals - Behavior as the code exits
