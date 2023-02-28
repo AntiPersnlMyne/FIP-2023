@@ -56,33 +56,32 @@ def go_back():
   board.motor_movement([1, 2], board.CCW, 50)
   time.sleep(0.5)
 def turn_left():  
-  board.motor_movement([1], board.CW, 60)
-  board.motor_movement([2], board.CCW, 40)
+  board.motor_movement([1], board.CW, 50)
+  board.motor_movement([2], board.CCW, 00)
   time.sleep(0.5)  
 def turn_right():
-  board.motor_movement([2], board.CW, 60)
-  board.motor_movement([1], board.CCW, 40)
+  board.motor_movement([2], board.CW, 50)
+  board.motor_movement([1], board.CCW, 00)
   time.sleep(0.5)
 
 def rc_controls():
-  key = input('press key')
-  if key == 'a':
+  if keyboard.is_pressed('a'):
     print("a is pressed")
     turn_left()
-  elif key == 's':
-    print("s is pressed")
-    go_back()
-  elif key == 'w':
-    print("w is pressed")
-    go_straight()
-  elif key == 'd':
+  elif keyboard.is_pressed('d'):
     print("d is pressed")
     turn_right()
-  elif key == 'q':
+  elif keyboard.is_pressed('w'):
+    print("w is pressed")
+    go_straight()
+  elif keyboard.is_pressed('s'):
+    print("s is pressed")
+    go_back()
+  elif keyboard.is_pressed('q'):
     print("q is pressed")
     board.motor_stop(board.all)
     print_board_status()
-    
+
 
 # @@@@@ EXECUTION @@@@@@
 if __name__ == "__main__":
@@ -95,20 +94,19 @@ if __name__ == "__main__":
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(100)   # Set DC motor pwm frequency to 1000HZ
   while True:
-    key = input('press key')
-    if key == 'a':
+    if keyboard.is_pressed('a'):
       print("a is pressed")
       turn_left()
-    elif key == 's':
-      print("s is pressed")
-      go_back()
-    elif key == 'w':
-      print("w is pressed")
-      go_straight()
-    elif key == 'd':
+    elif keyboard.is_pressed('d'):
       print("d is pressed")
       turn_right()
-    elif key == 'q':
+    elif keyboard.is_pressed('w'):
+      print("w is pressed")
+      go_straight()
+    elif keyboard.is_pressed('s'):
+      print("s is pressed")
+      go_back()
+    elif keyboard.is_pressed('q'):
       print("q is pressed")
       board.motor_stop(board.all)
       print_board_status()
