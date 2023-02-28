@@ -56,12 +56,12 @@ def go_back():
   board.motor_movement([1, 2], board.CCW, 50)
   time.sleep(0.5)
 def turn_left():  
-  board.motor_movement([1], board.CW, 50)
-  board.motor_movement([2], board.CCW, 00)
+  board.motor_movement([1], board.CW, 70)
+  board.motor_movement([2], board.CCW, 30)
   time.sleep(0.5)  
 def turn_right():
-  board.motor_movement([2], board.CW, 50)
-  board.motor_movement([1], board.CCW, 00)
+  board.motor_movement([2], board.CW, 70)
+  board.motor_movement([1], board.CCW, 30)
   time.sleep(0.5)
 
 def rc_controls():
@@ -92,7 +92,7 @@ if __name__ == "__main__":
   
   
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
-  board.set_moter_pwm_frequency(100)   # Set DC motor pwm frequency to 1000HZ
+  board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
   while True:
     if keyboard.is_pressed('a'):
       print("a is pressed")
@@ -106,7 +106,12 @@ if __name__ == "__main__":
     elif keyboard.is_pressed('s'):
       print("s is pressed")
       go_back()
-    elif keyboard.is_pressed('q'):
-      print("q is pressed")
+    elif keyboard.is_pressed('e'):
+      print("e is pressed")
+      board.motor_movement([2], board.CW, 1)
+      board.motor_movement([1], board.CCW, 1)
+      time.sleep(0.5)
+    elif keyboard.is_pressed('esc'):
+      print("esc is pressed")
       board.motor_stop(board.all)
       print_board_status()
