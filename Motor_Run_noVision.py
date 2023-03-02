@@ -56,31 +56,13 @@ def go_back():
   board.motor_movement([1, 2], board.CCW, 50)
   time.sleep(0.5)
 def turn_left():  
-  board.motor_movement([1], board.CW, 70)
-  board.motor_movement([2], board.CCW, 30)
+  board.motor_movement([1], board.CW, 50)
+  board.motor_movement([2], board.CCW, 20)
   time.sleep(0.5)  
 def turn_right():
-  board.motor_movement([2], board.CW, 70)
-  board.motor_movement([1], board.CCW, 30)
+  board.motor_movement([2], board.CW, 50)
+  board.motor_movement([1], board.CCW, 20)
   time.sleep(0.5)
-
-def rc_controls():
-  if keyboard.is_pressed('a'):
-    print("a is pressed")
-    turn_left()
-  elif keyboard.is_pressed('d'):
-    print("d is pressed")
-    turn_right()
-  elif keyboard.is_pressed('w'):
-    print("w is pressed")
-    go_straight()
-  elif keyboard.is_pressed('s'):
-    print("s is pressed")
-    go_back()
-  elif keyboard.is_pressed('q'):
-    print("q is pressed")
-    board.motor_stop(board.all)
-    print_board_status()
 
 
 # @@@@@ EXECUTION @@@@@@
@@ -94,23 +76,19 @@ if __name__ == "__main__":
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
   while True:
-    if keyboard.is_pressed('a'):
+    event = keyboard.read_event()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'a':
       print("a is pressed")
       turn_left()
-    elif keyboard.is_pressed('d'):
+    elif event.event_type == keyboard.KEY_DOWN and event.name == 'd':
       print("d is pressed")
       turn_right()
-    elif keyboard.is_pressed('w'):
+    elif event.event_type == keyboard.KEY_DOWN and event.name == 'w':
       print("w is pressed")
       go_straight()
-    elif keyboard.is_pressed('s'):
+    elif event.event_type == keyboard.KEY_DOWN and event.name == 's':
       print("s is pressed")
       go_back()
-    elif keyboard.is_pressed('e'):
-      print("e is pressed")
-      board.motor_movement([2], board.CW, 1)
-      board.motor_movement([1], board.CCW, 1)
-      time.sleep(0.5)
     elif keyboard.is_pressed('esc'):
       print("esc is pressed")
       board.motor_stop(board.all)
