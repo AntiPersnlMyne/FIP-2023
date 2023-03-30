@@ -49,37 +49,27 @@ def handle_exit():
 
 # @@@Direction controls@@@
 # Turns are not currently accurate. Must try different speed/time/without wires
-def go_straight():
-  board.motor_movement([1, 2], board.CW, 50)
-  time.sleep(0.5)
-def go_back():
-  board.motor_movement([1, 2], board.CCW, 50)
-  time.sleep(0.5)
-def turn_left():  
-  board.motor_movement([1], board.CW, 50)
-  board.motor_movement([2], board.CCW, 20)
-  time.sleep(0.5)  
-def turn_right():
+def right_forward():
   board.motor_movement([2], board.CW, 50)
-  board.motor_movement([1], board.CCW, 20)
-  time.sleep(0.5)
   
-def go_straightleft():
-  board.motor_movement([2], board.CW, 60)
-  board.motor_movement([1], board.CW, 30)
-  time.sleep(0.5)
-def go_backleft():
-  board.motor_movement([2], board.CCW, 60)
-  board.motor_movement([1], board.CCW, 30)
-  time.sleep(0.5)
-def go_straightright():
-  board.motor_movement([1], board.CW, 60)
-  board.motor_movement([2], board.CW, 30)
-  time.sleep(0.5)
-def go_backright():
-  board.motor_movement([1], board.CW, 60)
-  board.motor_movement([2], board.CCW, 30)
-  time.sleep(0.5)
+def right_neutral():
+  board.motor_movement([2], board.CW, 10)
+  
+def right_back():  
+  board.motor_movement([2], board.CCW, 50)
+  
+  
+def left_forward():
+  board.motor_movement([1], board.CW, 50)
+  
+def left_neutral():
+  board.motor_movement([1], board.CW, 10)
+  
+def left_back():
+  board.motor_movement([1], board.CCW, 50)
+  
+
+  
 
 # @@@@@ EXECUTION @@@@@@
 if __name__ == "__main__":
@@ -93,31 +83,18 @@ if __name__ == "__main__":
   board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
   while True:
     event = keyboard.read_event()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
+      left_forward()
     if event.event_type == keyboard.KEY_DOWN and event.name == 'a':
-      print("a is pressed")
-      turn_left()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'd':
-      print("d is pressed")
-      turn_right()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'w':
-      print("w is pressed")
-      go_straight()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 's':
-      print("s is pressed")
-      go_back()
-  
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 's+a':
-      print("both sa is pressed")
-      go_backleft()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 's+d':
-      print("both sd is pressed")
-      go_backright()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'w+d':
-      print("both wd is pressed")
-      go_straightright()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'w+a':
-      print("both wa is pressed")
-      go_straightleft()
+      left_neutral()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'z':
+      left_back()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'w':
+      right_forward()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 's':
+      right_neutral()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'x':
+      right_back()
     
     elif keyboard.is_pressed('esc'):
       print("esc is pressed")
