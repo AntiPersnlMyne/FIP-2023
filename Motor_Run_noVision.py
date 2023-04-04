@@ -49,20 +49,33 @@ def handle_exit():
 
 # @@@Direction controls@@@
 # Turns are not currently accurate. Must try different speed/time/without wires
+# 2 is the weak motor
 def go_straight():
-  board.motor_movement([1, 2], board.CW, 50)
-  time.sleep(0.5)
+  board.motor_movement([2], board.CW, 90)
+  board.motor_movement([1], board.CW, 90)
+  #time.sleep(0.5) deprecated from "Enter" days
 def go_back():
-  board.motor_movement([1, 2], board.CCW, 50)
-  time.sleep(0.5)
+  board.motor_movement([2], board.CCW, 90)
+  board.motor_movement([1], board.CCW, 90)  
+  #time.sleep(0.5) deprecated from "Enter" days
+def swivel_left():  
+  board.motor_movement([2], board.CW, 90)
+  board.motor_movement([1], board.CCW, 90)
+  #time.sleep(0.5) deprecated from "Enter" days
+def swivel_right():
+  board.motor_movement([1], board.CW, 90)
+  board.motor_movement([2], board.CCW, 90)
+  #time.sleep(0.5) deprecated from "Enter" days
 def turn_left():  
-  board.motor_movement([1], board.CW, 50)
-  board.motor_movement([2], board.CCW, 20)
-  time.sleep(0.5)  
+  board.motor_movement([2], board.CW, 90)
+  board.motor_movement([1], board.CW, 30)
+  #time.sleep(0.5) deprecated from "Enter" days
 def turn_right():
-  board.motor_movement([2], board.CW, 50)
-  board.motor_movement([1], board.CCW, 20)
-  time.sleep(0.5)
+  board.motor_movement([1], board.CW, 90)
+  board.motor_movement([2], board.CW, 30)
+  #time.sleep(0.5) deprecated from "Enter" days
+def keyPressed():
+  holding 
 
 
 # @@@@@ EXECUTION @@@@@@
@@ -72,24 +85,33 @@ if __name__ == "__main__":
   signal.signal(signal.SIGTERM, handle_exit)
   board_detection() 
   
-  
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
   while True:
     event = keyboard.read_event()
     if event.event_type == keyboard.KEY_DOWN and event.name == 'a':
-      print("a is pressed")
+      print("\na is pressed")
+      swivel_left()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'd':
+      print("\nd is pressed")
+      swivel_right()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
+      print("\nq is pressed")
       turn_left()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'd':
-      print("d is pressed")
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'e':
+      print("\ne is pressed")
       turn_right()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 'w':
-      print("w is pressed")
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'w':
+      print("\nw is pressed")
       go_straight()
-    elif event.event_type == keyboard.KEY_DOWN and event.name == 's':
-      print("s is pressed")
+    if event.event_type == keyboard.KEY_DOWN and event.name == 's':
+      print("\ns is pressed")
       go_back()
+    if event.event_type == keyboard.KEY_DOWN and event.name == 'p':
+      print("\n pause")
+      board.motor_movement([2], board.CW, 15)
+      board.motor_movement([1], board.CW, 10)
     elif keyboard.is_pressed('esc'):
-      print("esc is pressed")
+      print("esc is pressed\n")
       board.motor_stop(board.all)
       print_board_status()
