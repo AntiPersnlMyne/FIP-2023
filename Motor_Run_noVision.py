@@ -16,7 +16,6 @@ from pynput import keyboard
 # @@@@@ VARIABLES @@@@@
 board = Board(1, 0x10)    # Select bus 1, set address to 0x10
 speed = 60
-40<speed<80
 
 
 # @@@@@ FUNCTIONS @@@@@
@@ -76,31 +75,24 @@ def turn_right():
   #time.sleep(0.5) deprecated from "Enter" days
 def keyPressed():
   holding 
-def speed_up():
-  speed == speed+5
-def slow_down():
-  speed == speed-5
+
 
 
 
 # @@@@@ EXECUTION @@@@@@
-if __name__ == "__main__":
-  # Register signals - Behavior as the code exits
-  atexit.register(handle_exit)
-  signal.signal(signal.SIGTERM, handle_exit)
-  board_detection() 
-  
-  board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
-  board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
 
 #while True:
+
 
 keys_pressed = set()
 
 def on_press(key, keys_pressed=keys_pressed):
+    global speed
+    
     try:
         keys_pressed.add(key.char)
-
+        
+        
         if 'a' in keys_pressed and 'w' in keys_pressed:
             print('w and a pressed')
             turn_left()
@@ -121,19 +113,21 @@ def on_press(key, keys_pressed=keys_pressed):
             swivel_right()
         elif 'r' in keys_pressed:
             print('r pressed')
-            speed == speed+5()
-            print(speed)
+            speed += 5
         elif 'f' in keys_pressed:
             print('f pressed')
-            speed == speed-5
-            print(speed)
+            speed -= 5
         elif 'Num Lock' in keys_pressed:
             print('esc is pressed')
             board.motor_stop([1,2])
         elif 'p' in keys_pressed:
             print('P is pressed')
             board.motor_stop([1,2])
-
+        if speed<40:
+          speed = 40
+        if 80<speed:
+          speed = 80
+        print(speed)
 
         '''
         elif 's' in keys_pressed and 'd' in keys_pressed:
@@ -156,3 +150,12 @@ with keyboard.Listener(
         on_press=on_press,
         on_release=on_release) as listener:
     listener.join()
+
+if __name__ == "__main__":
+  # Register signals - Behavior as the code exits
+  atexit.register(handle_exit)
+  signal.signal(signal.SIGTERM, handle_exit)
+  board_detection() 
+  
+  board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
+  board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
