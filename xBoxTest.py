@@ -12,6 +12,13 @@ for i in range(0, pygame.joystick.get_count()):
 # Print out the name of the controller
 print(pygame.joystick.Joystick(0).get_name())
 
+# Setup Working Speeds
+lStickLatSpeed = 0
+lStickVertSpeed = 0
+rStickLatSpeed = 0
+rStickVertSpeed = 0
+# ||||||||||||||
+
 # Xbox Joystick Axis:
 # Axis 0 up down, down value is -1, up value is 1
 # Axis 1 Left, Right, Left value is: -1, right value is 1
@@ -46,7 +53,7 @@ while True or KeyboardInterrupt:
             if event.button == 10:
                 print("button 10 down")
                 
-        if event.type == pygame.JOYAXISMOTION:
+        if event.type == pygame.JOYAXISMOTION: # Axis Action
             axis = event.axis
             axisValue = event.value
             
@@ -70,15 +77,15 @@ while True or KeyboardInterrupt:
                         sleep(0.01)
 
             
-            if axis == 3: # Right stick 
-                # if axis == 4: # left/right                              - Deadass, -cstick Left/Right just doesn't work
-                #     if axisValue < -0.5:
-                #         print(f"Left value: {axisValue:.2f} \n")
-                #         sleep(0.01)
+            if axis > 1 or axis < 4: # Right stick 
+                if axis == 2: # left/right                              - Deadass, -cstick Left/Right just doesn't work
+                    if axisValue < -0.5:
+                        print(f"Left -cstick: {axisValue:.2f} \n")
+                        sleep(0.01)
 
-                #     if axisValue > 0.5:
-                #         print(f"Right value: {axisValue:.2f} \n")               
-                #         sleep(0.01)
+                    if axisValue > 0.5:
+                        print(f"Right -cstick: {axisValue:.2f} \n")               
+                        sleep(0.01)
 
                 if axis == 3: # up/down                                 - Up/Down does though for -cstick
                     if axisValue < -0.5:
@@ -89,12 +96,39 @@ while True or KeyboardInterrupt:
                         print(f"Down -cstick  : {axisValue:.2f} \n")
                         sleep(0.01)
             
-            if axis > 4:
+            if axis > 3:
                 print("No, we're not using this.. dumbass")
+                
+                
+        if event.type == pygame.JOYHATMOTION: # Hat Action
+            hat_x, hat_y = event.value
 
+            if hat_x > 0: # Press right
+                if hat_y == 1: # Right and Up
+                    print("Right and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Right and Down -DPAD")
+                if hat_y == 0:
+                    print("Right          -DPAD")
+                    
+
+            if hat_x == 0:
+                if hat_y == 1: # Up
+                    print("Up             -DPAD")
+                if hat_y == -1: # Down
+                    print("Down           -DPAD")
+                
+                
+            if hat_x < 0:
+                if hat_y == 1: # Left and Up
+                    print("Left and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Left and Down -DPAD")
+                if hat_y == 0:
+                    print("Left          -DPAD")
                         
     """
-    The Xbox 360 controller mapping has 6 axes, 11 buttons and 1 hat. The controller is recognized as "Xbox 360 Controller".
+    The Xbox 1 controller mapping has 6 axes, 11 buttons and 1 hat.
 
     Left Stick:
 
@@ -103,12 +137,12 @@ while True or KeyboardInterrupt:
 
     Right Stick:
 
-    Left -> Right   - Axis 3
-    Up   -> Down    - Axis 4
+    Left -> Right   - Axis 2
+    Up   -> Down    - Axis 3
 
     Left Trigger:
 
-    Out -> In       - Axis 2
+    Out -> In       - Axis 4
 
     Right Trigger:
 
