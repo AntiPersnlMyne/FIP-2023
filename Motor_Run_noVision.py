@@ -24,6 +24,8 @@ def board_detect():
   print("Board list conform:")
   print(l)
 
+
+
 def print_board_status():
   if board.last_operate_status == board.STA_OK:
     print("board status: everything ok")
@@ -40,7 +42,7 @@ def board_detection():
   board_detect()
   while board.begin() != board.STA_OK:    # Board begin and check board status
     print_board_status()
-    print("board begin faild")
+    print("board begin failed")
     time.sleep(2)
   print("board begin success")
 
@@ -83,6 +85,8 @@ def keyPressed():
 
 #while True:
 
+atexit.register(handle_exit)
+signal.signal(signal.SIGTERM, handle_exit)
 
 keys_pressed = set()
 
@@ -123,6 +127,10 @@ def on_press(key, keys_pressed=keys_pressed):
         elif 'p' in keys_pressed:
             print('P is pressed')
             board.motor_stop([1,2])
+        else:
+            board.motor_stop([1,2])
+
+        
         if speed<40:
           speed = 40
         if 80<speed:
