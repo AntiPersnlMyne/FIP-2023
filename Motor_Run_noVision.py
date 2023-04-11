@@ -7,7 +7,7 @@ import time
 from DFRobot_RaspberryPi_DC_Motor import DFRobot_DC_Motor_IIC as Board
 import signal
 import atexit
-import keyboard
+from pynput import keyboard
 # IMPORTANT
 # Requires the library "DFRobot_RaspberryPi_DC_Motor" to be in the current working directory
 # That means in the same folder, or remove the commented sys.path for an adjustment
@@ -15,7 +15,8 @@ import keyboard
 
 # @@@@@ VARIABLES @@@@@
 board = Board(1, 0x10)    # Select bus 1, set address to 0x10
-
+speed = 60
+40<speed<80
 
 
 # @@@@@ FUNCTIONS @@@@@
@@ -48,34 +49,38 @@ def handle_exit():
   board.motor_stop(board.ALL)   #stop all DC motor
 
 # @@@Direction controls@@@
-# Turns are not currently accurate. Must try different speed/time/without wires
-# 2 is the weak motor
+#Base speed is 60
 def go_straight():
-  board.motor_movement([2], board.CW, 90)
-  board.motor_movement([1], board.CW, 90)
+  board.motor_movement([2], board.CW, speed)
+  board.motor_movement([1], board.CW, speed)
   #time.sleep(0.5) deprecated from "Enter" days
 def go_back():
-  board.motor_movement([2], board.CCW, 90)
-  board.motor_movement([1], board.CCW, 90)  
+  board.motor_movement([2], board.CCW, speed)
+  board.motor_movement([1], board.CCW, speed)  
   #time.sleep(0.5) deprecated from "Enter" days
 def swivel_left():  
-  board.motor_movement([2], board.CW, 90)
-  board.motor_movement([1], board.CCW, 90)
+  board.motor_movement([2], board.CW, speed)
+  board.motor_movement([1], board.CCW, speed)
   #time.sleep(0.5) deprecated from "Enter" days
 def swivel_right():
-  board.motor_movement([1], board.CW, 90)
-  board.motor_movement([2], board.CCW, 90)
+  board.motor_movement([1], board.CW, speed)
+  board.motor_movement([2], board.CCW, speed)
   #time.sleep(0.5) deprecated from "Enter" days
 def turn_left():  
-  board.motor_movement([2], board.CW, 90)
-  board.motor_movement([1], board.CW, 30)
+  board.motor_movement([2], board.CW, speed+15)
+  board.motor_movement([1], board.CW, speed-35)
   #time.sleep(0.5) deprecated from "Enter" days
 def turn_right():
-  board.motor_movement([1], board.CW, 90)
-  board.motor_movement([2], board.CW, 30)
+  board.motor_movement([1], board.CW, speed+15)
+  board.motor_movement([2], board.CW, speed-35)
   #time.sleep(0.5) deprecated from "Enter" days
 def keyPressed():
   holding 
+def speed_up():
+  speed == speed+5
+def slow_down():
+  speed == speed-5
+
 
 
 # @@@@@ EXECUTION @@@@@@
@@ -87,31 +92,67 @@ if __name__ == "__main__":
   
   board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
   board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
-  while True:
-    event = keyboard.read_event()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'a':
-      print("\na is pressed")
-      swivel_left()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'd':
-      print("\nd is pressed")
-      swivel_right()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'q':
-      print("\nq is pressed")
-      turn_left()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'e':
-      print("\ne is pressed")
-      turn_right()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'w':
-      print("\nw is pressed")
-      go_straight()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 's':
-      print("\ns is pressed")
-      go_back()
-    if event.event_type == keyboard.KEY_DOWN and event.name == 'p':
-      print("\n pause")
-      board.motor_movement([2], board.CW, 15)
-      board.motor_movement([1], board.CW, 10)
-    elif keyboard.is_pressed('esc'):
-      print("esc is pressed\n")
-      board.motor_stop(board.all)
-      print_board_status()
+
+#while True:
+
+keys_pressed = set()
+
+def on_press(key, keys_pressed=keys_pressed):
+    try:
+        keys_pressed.add(key.char)
+
+        if 'a' in keys_pressed and 'w' in keys_pressed:
+            print('w and a pressed')
+            turn_left()
+        elif 'd' in keys_pressed and 'w' in keys_pressed:
+            print('w and d pressed')
+            turn_right()
+        elif 'a' in keys_pressed:
+            swivel_left()
+            print('a pressed')
+        elif 'w' in keys_pressed:
+            print('w pressed')
+            go_straight()
+        elif 's' in keys_pressed:
+            print('s pressed')
+            go_back()
+        elif 'd' in keys_pressed:
+            print('d pressed')
+            swivel_right()
+        elif 'r' in keys_pressed:
+            print('r pressed')
+            speed == speed+5()
+            print(speed)
+        elif 'f' in keys_pressed:
+            print('f pressed')
+            speed == speed-5
+            print(speed)
+        elif 'Num Lock' in keys_pressed:
+            print('esc is pressed')
+            board.motor_stop([1,2])
+        elif 'p' in keys_pressed:
+            print('P is pressed')
+            board.motor_stop([1,2])
+
+
+        '''
+        elif 's' in keys_pressed and 'd' in keys_pressed:
+            print('s and d pressed')
+        elif 's' in keys_pressed and 'a' in keys_pressed:
+            print('s and d pressed')
+        '''
+        
+        #
+    except AttributeError:
+        print('special key {0} pressed'.format(
+            key))
+
+def on_release(key, keys_pressed=keys_pressed):
+    keys_pressed -= {key.char}
+    if key == keyboard.Key.esc:
+        return False
+
+with keyboard.Listener(
+        on_press=on_press,
+        on_release=on_release) as listener:
+    listener.join()
