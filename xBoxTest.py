@@ -1,35 +1,66 @@
 # We use Pygame to access the Xbox One Controller
 import pygame
 from time import sleep
-from pygame.constants import JOYBUTTONDOWN
+from time import monotonic
 pygame.init()
 
+# TODO
+# Add a timer for the NOS to make it a temporary method
+# Add motor functionality to stick methods
+# Add speed (integer) adjustment functionality for buttons
+
+#Globalize Variables
+global canBoost, startTimer, lStickSpeed, rStickSpeed
+# ||||||||||||||||||
+
+# Initialize Joysticks
 joysticks = []
 for i in range(0, pygame.joystick.get_count()):
     joysticks.append(pygame.joystick.Joystick(i))
     joysticks[-1].init()
-
+    
 # Print out the name of the controller
 print(pygame.joystick.Joystick(0).get_name())
+# ||||||||||||||||||||
 
 # Setup Working Speeds
-lStickLatSpeed = 0
-lStickVertSpeed = 0
-rStickLatSpeed = 0
-rStickVertSpeed = 0
-# ||||||||||||||
+lStickSpeed = 0
+rStickSpeed = 0
+# Only applies in the vertical direction
+# ||||||||||||||||||||
 
-# Xbox Joystick Axis:
-# Axis 0 up down, down value is -1, up value is 1
-# Axis 1 Left, Right, Left value is: -1, right value is 1
-# center is always 0
+# Setup Times
+startTimer = monotonic()
+currentTime = 0
+interval =    8 # measures in seconds | Time until a speed boost becomes available
+# |||||||||||
+
+# Variables for Joystick Actions
+canBoost = False
+# makeSound = True
+# ||||||||||||||||||||||||||||||
+
+
+# Resets the Timer and allows for boosting
+def checkBoost(timeNow):
+    if (timeNow - startTimer >= 8):
+        canBoost = True
+        startTimer = timeNow # Resets elapsed time to 0
+        # This keeps running every interval, probably not good for memory
+
+def hitTheNOS():
+    print("speed-boost action!")
+    lStickSpeed += 20
+    rStickSpeed += 20
+    #Changes adds an additional +20 pwm
+    #Assumes speed can is at 80
 
 # Main Loop
 while True or KeyboardInterrupt:
 
     # Check for joystick events
     for event in pygame.event.get():
-        if event.type == JOYBUTTONDOWN: # Button Action
+        if event.type == pygame.JOYBUTTONDOWN: # Button Action
             if event.button == 0:
                 print("button 0 down")
             if event.button == 1:
@@ -57,7 +88,7 @@ while True or KeyboardInterrupt:
             axis = event.axis
             axisValue = event.value
             
-            if axis < 2: # Left stick
+            if axis < 2: # Left stick - Left Motor
                 if axis == 0: # left/right
                     if axisValue < -0.5:
                         print(f"Left value: {axisValue:.2f} \n")
@@ -76,8 +107,7 @@ while True or KeyboardInterrupt:
                         print(f"Down value: {axisValue:.2f} \n")
                         sleep(0.01)
 
-            
-            if axis > 1 or axis < 4: # Right stick 
+            if axis > 1 or axis < 4: # Right stick - Right motor
                 if axis == 2: # left/right                              - Deadass, -cstick Left/Right just doesn't work
                     if axisValue < -0.5:
                         print(f"Left -cstick: {axisValue:.2f} \n")
@@ -97,9 +127,9 @@ while True or KeyboardInterrupt:
                         sleep(0.01)
             
             if axis > 3:
-                print("No, we're not using this.. dumbass")
-                
-                
+                print("Schweepstakes! Power boost!") 
+                hitTheNOS() # Make sure this function sets canBoost to False  
+                               
         if event.type == pygame.JOYHATMOTION: # Hat Action
             hat_x, hat_y = event.value
 
@@ -126,7 +156,11 @@ while True or KeyboardInterrupt:
                     print("Left and Down -DPAD")
                 if hat_y == 0:
                     print("Left          -DPAD")
-                        
+    
+    currentTime = monotonic()
+    checkBoost(currentTime)
+    
+             
     """
     The Xbox 1 controller mapping has 6 axes, 11 buttons and 1 hat.
 
@@ -167,3 +201,8 @@ while True or KeyboardInterrupt:
     Down -> Up      - Y Axis
     Left -> Right   - X Axis
     """
+    
+# Xbox Joystick Axis:
+# Axis 0 up down, down value is -1, up value is 1
+# Axis 1 Left, Right, Left value is: -1, right value is 1
+# center is always 0
