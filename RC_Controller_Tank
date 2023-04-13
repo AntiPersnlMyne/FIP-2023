@@ -1,0 +1,213 @@
+# @@@@@@ IMPORTS @@@@@@
+from __future__ import print_function
+import sys
+import os
+
+import pygame
+import time
+from DFRobot_RaspberryPi_DC_Motor import DFRobot_DC_Motor_IIC as Board
+import signal
+import atexit
+# IMPORTANT
+# Requires the library "DFRobot_RaspberryPi_DC_Motor" to be in the current working directory
+# That means in the same folder, or remove the commented sys.path for an adjustment
+
+pygame.init()
+
+# NOTE !!!!
+# The Axis are a little screw-y concerning the c-stick and the shoulders
+# Don't know why they're different on Windows
+
+# @@@@@ VARIABLES @@@@@
+board = Board(1, 0x10)    # Select bus 1, set address to 0x10
+global canBoost, startTimer
+
+# Initialize Joysticks
+joysticks = []
+for i in range(0, pygame.joystick.get_count()):
+    joysticks.append(pygame.joystick.Joystick(i))
+    joysticks[-1].init()
+
+# Setup Times
+startTimer = time.monotonic()
+currentTime = 0
+interval =    8 # measures in seconds | Time until a speed boost becomes available
+boostStart = 0
+boostEnd =   3 # measures in seconds | Time remaining for speed boost until drain 
+
+# Variables for Joystick Actions
+canBoost = False
+maxPWM = 80
+speedBoostPWM = 100
+# @@@@@@@@@@@@@@@@@@@@@
+
+
+def handle_exit():
+  board.motor_stop(board.ALL)   #stop all DC motor
+# @@@@@@@@@@@@@@@@@@@@@
+
+
+# @@@@@ EXECUTION @@@@@@
+if __name__ == "__main__":
+  # Register signals - Behavior as the code exits
+  atexit.register(handle_exit)
+  signal.signal(signal.SIGTERM, handle_exit)
+  
+  board.set_encoder_disable(board.ALL)                  # Set selected DC motor encoder disable
+  board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
+
+#while True:
+
+while True or KeyboardInterrupt:
+
+    # Check for joystick events
+    for event in pygame.event.get():
+        if event.type == pygame.JOYBUTTONDOWN: # Button Action
+            if event.button == 0:
+                print("button 0 down")
+            if event.button == 1:
+                print("button 1 down")
+            if event.button == 2:
+                print("button 2 down")
+            if event.button == 3:
+                print("button 3 down")
+            if event.button == 4:
+                print("button 4 down")
+            if event.button == 5:
+                print("button 5 down")
+            if event.button == 6:
+                print("#SteamUpdate")
+                board.motor_stop([1,2])
+                board.motor_stop(all)
+            if event.button == 7:
+                print("Stop Robot")
+                board.motor_stop([1,2])
+            if event.button == 8:
+                print("button 8 down")
+            if event.button == 9:
+                print("button 9 down")
+            if event.button == 10:
+                print("button 10 down")
+                
+        if event.type == pygame.JOYAXISMOTION: # Axis Action
+            axis = event.axis
+            axisValue = event.value
+            
+            if axis < 2: # Left stick - Left Motor
+                if axis == 0: # left/right
+                    if axisValue < -0.1: # Left
+                        print(f"Left value: {axisValue:.2f} \n")
+
+                    if axisValue > 0.1: # Right
+                        print(f"Right value: {axisValue:.2f} \n") 
+
+                if axis == 1: # up/down
+                    if axisValue < -0.1: # Up
+                        board.motor_movement([1], board.CW, abs(maxPWM*axisValue))
+                    elif axisValue > 0.1: # Down
+                        board.motor_movement([1], board.CCW, maxPWM*axisValue)  
+                    else:
+                        board.motor_stop([1])
+
+            if axis > 1 or axis < 4: 
+                if axis == 2: # Left Shoulder                           - These are swapped with Version 3's axis'
+                    if axisValue < -0.1: # Release -> Halfway
+                        print(f"L-Shoulder start Press: {axisValue:.2f} \n")
+
+                    if axisValue > 0.1: # Halfway -> Press
+                        print(f"L-Shoulder full Press: {axisValue:.2f} \n")               
+
+                if axis == 3: # Right stick - Left/Right                                - These are swapped with Version 3's axis'
+                    if axisValue < -0.1: # Left
+                        print(f"Left -cstick  : {axisValue:.2f} \n")
+
+                    if axisValue > 0.1: # Right
+                        print(f"Right -cstick  : {axisValue:.2f} \n")
+            
+            if axis > 3 or axis < 6:
+              if axis == 4: # Up/Down -cstick
+                    if axisValue < -0.1: # Up
+                        #print(f"Up -cstick  : {axisValue:.2f} \n")
+                        board.motor_movement([2], board.CW, abs(maxPWM*axisValue))
+
+                    elif axisValue > 0.1: # Down
+                        #print(f"Down -cstick  : {axisValue:.2f} \n")
+                        board.motor_movement([2], board.CCW, maxPWM*axisValue)
+                        
+                    else:
+                        board.motor_stop([2])
+              
+              if axis == 5: # Right shoulder
+                    if axisValue < -0.1: # Release -> Halfway
+                        print(f"R-Shoulder start Press: {axisValue:.2f} \n")
+
+                    if axisValue > 0.1: # Halfway -> Press
+                        print(f"R-Shoulder full Press: {axisValue:.2f} \n")
+                
+        if event.type == pygame.JOYHATMOTION: # Hat Action
+            hat_x, hat_y = event.value
+
+            if hat_x > 0: # Press right
+                if hat_y == 1: # Right and Up
+                    print("Right and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Right and Down -DPAD")
+                if hat_y == 0:
+                    print("Right          -DPAD")
+                    
+
+            if hat_x == 0:
+                if hat_y == 1: # Up
+                    print("Up             -DPAD")
+                if hat_y == -1: # Down
+                    print("Down           -DPAD")
+                
+                
+            if hat_x < 0:
+                if hat_y == 1: # Left and Up
+                    print("Left and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Left and Down -DPAD")
+                if hat_y == 0:
+                    print("Left          -DPAD")
+    
+    currentTime = time.monotonic()
+    #checkBoost(currentTime)
+
+
+
+
+
+    """
+    The Xbox 1 controller mapping has 6 axes, 11 buttons and 1 hat.
+    Left Stick:
+    Left -> Right   - Axis 0
+    Up   -> Down    - Axis 1
+    Right Stick:
+    Left -> Right   - Axis 2
+    Up   -> Down    - Axis 3
+    Left Trigger:
+    Out -> In       - Axis 4
+    Right Trigger:
+    Out -> In       - Axis 5
+    Buttons:
+    A Button        - Button 0
+    B Button        - Button 1
+    X Button        - Button 2
+    Y Button        - Button 3
+    Left Bumper     - Button 4
+    Right Bumper    - Button 5
+    Back Button     - Button 6
+    Start Button    - Button 7
+    L. Stick In     - Button 8
+    R. Stick In     - Button 9
+    Guide Button    - Button 10
+    Hat/D-pad:
+    Down -> Up      - Y Axis
+    Left -> Right   - X Axis
+    """
+    
+# Xbox Joystick Axis:
+# Axis 0 up down, down value is -1, up value is 1
+# Axis 1 Left, Right, Left value is: -1, right value is 1
+# center is always 0
