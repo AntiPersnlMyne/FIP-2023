@@ -71,10 +71,14 @@ while True or KeyboardInterrupt:
                 print("button 2 down")
             if event.button == 3:
                 print("button 3 down")
-            if event.button == 4:
+            if event.button == 4: #Left bumper
                 print("button 4 down")
-            if event.button == 5:
+                board.motor_movement([1], board.CW, maxPWM)
+                board.motor_movement([2], board.CCW, maxPWM)
+            if event.button == 5: #right bumper
                 print("button 5 down")
+                board.motor_movement([1], board.CCW, maxPWM)
+                board.motor_movement([2], board.CW, maxPWM)
             if event.button == 6:
                 print("#SteamUpdate")
                 board.motor_stop([1,2])
@@ -101,21 +105,23 @@ while True or KeyboardInterrupt:
                     if axisValue > 0.1: # Right
                         print(f"Right value: {axisValue:.2f} \n") 
 
-                if axis == 1: # up/down
+                if axis == 1: # up/down both
                     if axisValue < -0.1: # Up
-                        board.motor_movement([1], board.CW, abs(maxPWM*axisValue))
+                        board.motor_movement([1,2], board.CW, abs(maxPWM*axisValue))
                     elif axisValue > 0.1: # Down
-                        board.motor_movement([1], board.CCW, maxPWM*axisValue)  
+                        board.motor_movement([1,2], board.CCW, maxPWM*axisValue)  
                     else:
                         board.motor_stop([1])
 
             if axis > 1 or axis < 4: 
-                if axis == 2: # Left Shoulder                           - These are swapped with Version 3's axis'
-                    if axisValue < -0.1: # Release -> Halfway
+                if axis == 2: # Left trigger                           - These are swapped with Version 3's axis'
+                    if axisValue > -0.95: # Release -> Halfway
                         print(f"L-Shoulder start Press: {axisValue:.2f} \n")
+                        board.motor_movement([1], board.CW, maxPWM)
+                        board.motor_movement([2], board.CCW, maxPWM)
 
-                    if axisValue > 0.1: # Halfway -> Press
-                        print(f"L-Shoulder full Press: {axisValue:.2f} \n")               
+                    #if axisValue > 0.1: # Halfway -> Press
+                        #print(f"L-Shoulder full Press: {axisValue:.2f} \n")               
 
                 if axis == 3: # Right stick - Left/Right                                - These are swapped with Version 3's axis'
                     if axisValue < -0.1: # Left
@@ -127,22 +133,24 @@ while True or KeyboardInterrupt:
             if axis > 3 or axis < 6:
               if axis == 4: # Up/Down -cstick
                     if axisValue < -0.1: # Up
-                        #print(f"Up -cstick  : {axisValue:.2f} \n")
-                        board.motor_movement([2], board.CW, abs(maxPWM*axisValue))
+                        print(f"Up -cstick  : {axisValue:.2f} \n")
+                        #board.motor_movement([2], board.CW, abs(maxPWM*axisValue))
 
                     elif axisValue > 0.1: # Down
-                        #print(f"Down -cstick  : {axisValue:.2f} \n")
-                        board.motor_movement([2], board.CCW, maxPWM*axisValue)
+                        print(f"Down -cstick  : {axisValue:.2f} \n")
+                        #board.motor_movement([2], board.CCW, maxPWM*axisValue)
                         
                     else:
                         board.motor_stop([2])
               
-              if axis == 5: # Right shoulder
-                    if axisValue < -0.1: # Release -> Halfway
+              if axis == 5: # Right trigger
+                    if axisValue > -0.95: # Release -> Halfway
                         print(f"R-Shoulder start Press: {axisValue:.2f} \n")
+                        board.motor_movement([1], board.CCW, maxPWM)
+                        board.motor_movement([2], board.CW, maxPWM)
 
-                    if axisValue > 0.1: # Halfway -> Press
-                        print(f"R-Shoulder full Press: {axisValue:.2f} \n")
+                    #if axisValue > 0.1: # Halfway -> Press
+                        #print(f"R-Shoulder full Press: {axisValue:.2f} \n")
                 
         if event.type == pygame.JOYHATMOTION: # Hat Action
             hat_x, hat_y = event.value
