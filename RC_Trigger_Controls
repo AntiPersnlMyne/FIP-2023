@@ -73,12 +73,8 @@ while True or KeyboardInterrupt:
                 print("button 3 down")
             if event.button == 4: #Left bumper
                 print("button 4 down")
-                board.motor_movement([1], board.CW, maxPWM)
-                board.motor_movement([2], board.CCW, maxPWM)
             if event.button == 5: #right bumper
                 print("button 5 down")
-                board.motor_movement([1], board.CCW, maxPWM)
-                board.motor_movement([2], board.CW, maxPWM)
             if event.button == 6:
                 print("#SteamUpdate")
                 board.motor_stop([1,2])
@@ -111,14 +107,17 @@ while True or KeyboardInterrupt:
                     elif axisValue > 0.1: # Down
                         board.motor_movement([1,2], board.CCW, maxPWM*axisValue)  
                     else:
-                        board.motor_stop([1])
+                        board.motor_stop([1,2])
 
             if axis > 1 or axis < 4: 
                 if axis == 2: # Left trigger                           - These are swapped with Version 3's axis'
                     if axisValue > -0.95: # Release -> Halfway
                         print(f"L-Shoulder start Press: {axisValue:.2f} \n")
-                        board.motor_movement([1], board.CW, maxPWM)
-                        board.motor_movement([2], board.CCW, maxPWM)
+                        board.motor_movement([1], board.CCW, maxPWM)
+                        board.motor_movement([2], board.CW, maxPWM)
+                    else:
+                       board.motor_stop([1,2])
+
 
                     #if axisValue > 0.1: # Halfway -> Press
                         #print(f"L-Shoulder full Press: {axisValue:.2f} \n")               
@@ -146,8 +145,11 @@ while True or KeyboardInterrupt:
               if axis == 5: # Right trigger
                     if axisValue > -0.95: # Release -> Halfway
                         print(f"R-Shoulder start Press: {axisValue:.2f} \n")
-                        board.motor_movement([1], board.CCW, maxPWM)
-                        board.motor_movement([2], board.CW, maxPWM)
+                        board.motor_movement([1], board.CW, maxPWM)
+                        board.motor_movement([2], board.CCW, maxPWM)
+                    else:
+                        board.motor_stop([1,2])
+
 
                     #if axisValue > 0.1: # Halfway -> Press
                         #print(f"R-Shoulder full Press: {axisValue:.2f} \n")
