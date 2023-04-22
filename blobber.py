@@ -105,6 +105,7 @@ if __name__=="__main__":
     picam2.start()
 
     # go
-    time.sleep(10)
-    print(times,times/10.0)
+    time.sleep(3)
+    print(times,times/3.0)
+    picam2.stop()
     
