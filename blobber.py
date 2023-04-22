@@ -45,7 +45,7 @@ def setup_blob():
 
 def setup_camera():
     global picam2
-
+    
     # create camera instance
     picam2 = Picamera2()
 
@@ -53,7 +53,7 @@ def setup_camera():
     picam2.set_controls({"ExposureTime": 1000, "AnalogueGain": 1.0})
 
 def process_frame():
-    """Do a single frame"""
+    """Do a single frame, manually"""
 
     # these are out in the globalness
     global picam2, detector
@@ -63,7 +63,7 @@ def process_frame():
 
     # convert it into gray and save it
     gs = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
-    #cv2.imwrite("bw.png", gs)
+    # cv2.imwrite("bw.png", gs)
 
     # Detect blobs.
     keypoints = detector.detect(im)
@@ -72,12 +72,13 @@ def process_frame():
 
     # Draw detected blobs as circles.
     # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-   # im_with_keypoints = cv2.drawKeypoints(im, keypoints, 
-    #                                      np.array([]), 
-     #                                     (255, 0, 0), 
-      #                                    cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    # im_with_keypoints = cv2.drawKeypoints(im, keypoints, 
+    #                                       np.array([]), 
+    #                                       (255, 0, 0), 
+    #                                       cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-   # cv2.imwrite("bleh.png", im_with_keypoints)
+    # cv2.imwrite("bleh.png", im_with_keypoints)
+
 
 def track(request):
     """Tracker Callback"""
@@ -86,24 +87,24 @@ def track(request):
     with MappedArray(request, "main") as m:
         keypoints = detector.detect(m.array)
         times = times + 1
-       # for k in keypoints:
-       #     pprint.pprint((k.pt, k.size))
-       
+
+        # for k in keypoints:
+        #     pprint.pprint((k.pt, k.size))
+
 
 if __name__=="__main__":
+
     setup_camera()
     setup_blob()
 
-
+    # set the callback
     picam2.pre_callback = track
 
     times = 0
     # start, give it a tick to wait
     picam2.start()
-    #time.sleep(1)
 
     # go
     time.sleep(10)
-    print(times, times/10.0)
-    #while True:
-        #print("newframe")
+    print(times,times/10.0)
+    
