@@ -91,6 +91,14 @@ def track(request):
         # for k in keypoints:
         #     pprint.pprint((k.pt, k.size))
 
+def calibrate():
+    """Determine the remapping"""
+    return
+
+def toMeatSpace(kp):
+    """does the transformation from sensor blob space to earth"""
+    return kp.pt
+
 
 if __name__=="__main__":
 
