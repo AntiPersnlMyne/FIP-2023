@@ -5,6 +5,8 @@
 * We're using the no-ir version of the imx519 sensor
 * <https://docs.arducam.com/Raspberry-Pi-Camera/Native-camera/16MP-IMX519/>
 * <https://www.raspberrypi.com/documentation/accessories/camera.html#getting-started>
+* <https://www.uctronics.com/arducam-imx519-autofocus-camera-module-for-raspberry-pi-noir.html>
+* <https://www.waveshare.com/wiki/IMX519-78_16MP_AF_Camera>
 
 ## `libcamera`
 
