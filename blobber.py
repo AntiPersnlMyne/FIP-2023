@@ -233,11 +233,26 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     """from the socketserver docs"""
     def handle(self):
         
-        # self.request is the TCP socket connected to the client
-        self.data = self.request.recv(1024).strip()
-        print("{} wrote:".format(self.client_address[0]))
-        print(self.data)
-        self.request.sendall(self.data.upper())
+        global server
+        global rOtto
+
+        while True:
+            # self.request is the TCP socket connected to the client
+            self.data = self.request.recv(1024).strip()
+            print("{} wrote:".format(self.client_address[0]))
+            print(self.data)
+            if self.data == b'getloc':
+                posx, posy = rOtto.get()
+                message = bytes('%.3f' % posx+','+ '%.3f' % posy,'UTF-8')
+                self.request.sendall(message)
+                print("sent",message)
+            elif self.data == b'done' or self.data == b'':
+                self.request.sendall(b"quitting")
+                print("quitting")
+                server.shutdown()
+            else:
+                # print("unknown message")
+                pass
 
         # encoding example    
         # thesx=str(ppp[0])+','+str(ppp[1])
@@ -260,7 +275,7 @@ if __name__=="__main__":
     setup_blob()
     setup_camera()
 
-    HOST, PORT = "127.0.0.1", 9998
+    HOST, PORT = "192.168.0.10", 9998
 
     # Create the server, binding to localhost on port 9999
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
@@ -271,7 +286,5 @@ if __name__=="__main__":
 
     # call server.shutdown() to stop the server
 
-    # go
-    time.sleep(3)
     picam2.stop()
     
