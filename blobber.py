@@ -109,15 +109,15 @@ class RobotThread(threading.Thread):
         threading.Thread.__init__(self)
         #initialize camera
         print("Robot Thread initialized")
-        
-    
 
     def findRobot(self):
         #find x y of robots
         global rOtto, rManuel
+        
+        #curx, cury = rOtto.get()
+        #print(curx, cury)
+        #rOtto.set(curx+(0.1*(random.random()-0.5)), cury+(0.1*(random.random()-0.5)))
 
-        curx, cury = rOtto.get()
-        rOtto.set(curx+random.random(), cury+random.random())
     
     def run(self):
         #calls find ball over and over
@@ -171,8 +171,8 @@ def track(request):
         keypoints = detector.detect(m.array)
 
         for k in keypoints:
-            pprint.pprint((k.pt, k.size))
-            rOtto.set(k.pt[0], k.pt[1])
+            # pprint.pprint((k.pt, k.size))
+            rOtto.set(k.pt[0],k.pt[1])
 
 
 def setup_camera():
@@ -199,34 +199,6 @@ def setup_camera():
 
 
 
-def process_frame():
-    """Do a single frame, manually"""
-
-    # these are out in the globalness
-    global picam2, detector
-
-    # grab a frame
-    im = picam2.capture_array("main")
-
-    # convert it into gray and save it
-    gs = cv2.cvtColor(im, cv2.COLOR_RGB2GRAY)
-    # cv2.imwrite("bw.png", gs)
-
-    # Detect blobs.
-    keypoints = detector.detect(im)
-    for k in keypoints:
-        pprint.pprint((k.pt, k.size))
-
-    # Draw detected blobs as circles.
-    # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-    # im_with_keypoints = cv2.drawKeypoints(im, keypoints, 
-    #                                       np.array([]), 
-    #                                       (255, 0, 0), 
-    #                                       cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-    # cv2.imwrite("bleh.png", im_with_keypoints)
-
-
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
@@ -239,16 +211,16 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         while True:
             # self.request is the TCP socket connected to the client
             self.data = self.request.recv(1024).strip()
-            print("{} wrote:".format(self.client_address[0]))
-            print(self.data)
+            # print("{} wrote:".format(self.client_address[0]))
+            # print(self.data)
             if self.data == b'getloc':
                 posx, posy = rOtto.get()
                 message = bytes('%.3f' % posx+','+ '%.3f' % posy,'UTF-8')
                 self.request.sendall(message)
-                print("sent",message)
+                # print("sent",message)
             elif self.data == b'done' or self.data == b'':
                 self.request.sendall(b"quitting")
-                print("quitting")
+                # print("quitting")
                 server.shutdown()
             else:
                 # print("unknown message")
@@ -263,9 +235,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 if __name__=="__main__":
 
     # global robots
-    rOtto = Robot(300*random.random(), 200*random.random())
-    rManuel = Robot(300*random.random(), 200*random.random())
-
+    rOtto = Robot(300.0*random.random(), 200.0*random.random())
+    rManuel = Robot(300.0*random.random(), 200.0*random.random())
+    
     # calibration
     # pixel space (right now in col,row space) then meat space (in cm right now)        
     cal = Calibration((0.0, 480.0), (640.0, 480.0), (0.0, 0.0),
@@ -275,9 +247,10 @@ if __name__=="__main__":
     setup_blob()
     setup_camera()
 
-    HOST, PORT = "192.168.0.10", 9998
+    # robotThread = RobotThread()
+    # robotThread.start()
 
-    # Create the server, binding to localhost on port 9999
+    HOST, PORT = "192.168.0.10", 9998
     server = socketserver.TCPServer((HOST, PORT), MyTCPHandler)
 
     # Activate the server; this will keep running until you
