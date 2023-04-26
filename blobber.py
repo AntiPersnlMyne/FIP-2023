@@ -18,6 +18,7 @@ import time
 import numpy as np
 import random
 
+import sys
 
 from picamera2 import Picamera2, MappedArray
 
@@ -221,6 +222,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             elif self.data == b'done' or self.data == b'':
                 self.request.sendall(b"quitting")
                 # print("quitting")
+                picam2.stop()
+                sys.exit()
                 server.shutdown()
             else:
                 # print("unknown message")
@@ -259,5 +262,4 @@ if __name__=="__main__":
 
     # call server.shutdown() to stop the server
 
-    picam2.stop()
     
