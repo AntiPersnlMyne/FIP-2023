@@ -103,28 +103,28 @@ class Robot():
         return self.bx - self.lastx, self.by - self.lasty
 
 
-class RobotThread(threading.Thread):
-    """Robot detection thread"""
+# class RobotThread(threading.Thread):
+#     """Robot detection thread"""
 
-    def __init__(self):
-        threading.Thread.__init__(self)
-        #initialize camera
-        print("Robot Thread initialized")
+#     def __init__(self):
+#         threading.Thread.__init__(self)
+#         #initialize camera
+#         print("Robot Thread initialized")
 
-    def findRobot(self):
-        #find x y of robots
-        global rOtto, rManuel
+#     def findRobot(self):
+#         #find x y of robots
+#         global rOtto, rManuel
         
-        #curx, cury = rOtto.get()
-        #print(curx, cury)
-        #rOtto.set(curx+(0.1*(random.random()-0.5)), cury+(0.1*(random.random()-0.5)))
+#         #curx, cury = rOtto.get()
+#         #print(curx, cury)
+#         #rOtto.set(curx+(0.1*(random.random()-0.5)), cury+(0.1*(random.random()-0.5)))
 
     
-    def run(self):
-        #calls find ball over and over
-        print("Robot thread go")
-        while True:
-            self.findRobot()
+#     def run(self):
+#         #calls find ball over and over
+#         print("Robot thread go")
+#         while True:
+#             self.findRobot()
   
 
 # blobber
@@ -145,7 +145,7 @@ def setup_blob():
 
     # Filter by Area.
     params.filterByArea = True
-    params.minArea = 10
+    params.minArea = 5
     params.maxArea = 500
 
     # Filter by Circularity
@@ -169,6 +169,7 @@ def track(request):
     global detector, rOtto
     
     with MappedArray(request, "main") as m:
+        # print(m.array.shape)
         keypoints = detector.detect(m.array)
 
         for k in keypoints:
@@ -180,22 +181,26 @@ def setup_camera():
     """Setup the camera."""
 
     global picam2
-    
+
+    tuning = Picamera2.load_tuning_file("imx519.json")
+
+    # algo = Picamera2.find_tuning_algo(tuning, "rpi.agc")
+    # algo["exposure_modes"]["normal"] = {"shutter": [100, 66666], "gain": [1.0, 8.0]}
+    # picam2 = Picamera2(tuning=tuning)
+
     # create camera instance
     picam2 = Picamera2()
-
-    video_config = picam2.create_video_configuration(main={"size": (1280, 720), "format": "RGB888"},
-                                                     lores={"size": (640, 480), "format": "YUV420"})
+    video_config = picam2.create_video_configuration(main={"size": (1280,720), "format": "RGB888"})
 
 
     picam2.configure(video_config)
-    picam2.set_controls({"ExposureTime": 1000, "AnalogueGain": 1.0})
+    picam2.set_controls({"ExposureTime": 10, "AnalogueGain": 1600})
 
     # set the callback
     picam2.pre_callback = track
 
     # start, give it a tick to wait
-    picam2.start_preview()
+    # picam2.start_preview()
     picam2.start()
 
 
@@ -218,7 +223,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 posx, posy = rOtto.get()
                 message = bytes('%.3f' % posx+','+ '%.3f' % posy,'UTF-8')
                 self.request.sendall(message)
-                # print("sent",message)
+                print("sent",message)
             elif self.data == b'done' or self.data == b'':
                 self.request.sendall(b"quitting")
                 # print("quitting")
