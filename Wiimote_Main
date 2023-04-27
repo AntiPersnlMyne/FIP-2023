@@ -1,0 +1,161 @@
+# @@@@@ IMPORTS @@@@@
+import pygame
+import time
+from time import monotonic
+from DFRobot_RaspberryPi_DC_Motor import DFRobot_DC_Motor_IIC as Board
+import signal
+import atexit
+import math
+
+pygame.init()
+board = Board(1, 0x10)    # Select bus 1, set address to 0x10
+# ///////////////////
+
+
+
+
+
+
+
+# @@@@@ VARIABLES @@@@@
+joysticks = []
+for i in range(0, pygame.joystick.get_count()):
+    joysticks.append(pygame.joystick.Joystick(i))
+    joysticks[-1].init()
+    
+print(pygame.joystick.Joystick(0).get_name())
+# Setup Times
+startTimer = monotonic()
+currentTime = 0
+interval =    8 # measures in seconds | Time until a speed boost becomes available
+boostStart = 0
+boostEnd =   3 # measures in seconds | Time remaining for speed boost until drain 
+
+# Variables for Joystick Actions
+canBoost = False
+maxPWM = 40
+global x, y
+x = 0 # For driving
+y =0  # For driving
+# /////////////////////
+
+
+
+
+
+
+
+# @@@@@ FUNCTIONS @@@@@
+def handle_exit():
+  board.motor_stop(board.ALL)   #stop all DC motor
+  
+def HitTheNos():
+    if canBoost:
+        return 100
+    else:
+        return 50
+# /////////////////////
+
+
+
+
+
+
+
+# @@@@@ EXECUTION @@@@@@
+if __name__ == "__main__":
+  # Register signals - Behavior as the code exits
+  atexit.register(handle_exit)
+  signal.signal(signal.SIGTERM, handle_exit)
+  
+  board.set_encoder_disable(board.ALL)  # Set selected DC motor encoder disable
+  board.set_moter_pwm_frequency(1200)   # Set DC motor pwm frequency to 1000HZ
+  
+# Main Loop:
+while True or KeyboardInterrupt:
+
+    # Check for joystick events
+    for event in pygame.event.get():
+        if event.type == pygame.JOYBUTTONDOWN: # Button Action
+            if event.button == 0:
+                print("button: A")
+                print("Boost pressed")
+                #HitTheNos()
+            if event.button == 1:
+                print("button: B")
+            if event.button == 2:
+                print("button: 1")
+            if event.button == 3:
+                print("button: 2")
+            if event.button == 4:
+                print("button: z")
+            if event.button == 5:
+                print("button: c")
+            if event.button == 6:
+                print("button: -")
+            if event.button == 7:
+                print("button: +")
+            if event.button == 8:
+                print("button: Home")
+                
+        if event.type == pygame.JOYAXISMOTION: # Axis Action
+            axis = event.axis                                       #NOTE
+            axisValue = event.value                                 # Right= y + x || Left= y - x
+            
+            if axis == 0: # left/right
+                x = round(axisValue, 4)
+
+            if axis == 1: # up/down
+                y = round(axisValue, 4)
+                
+            Right = y + x
+            Left  = y - x
+            
+            
+            if Right < - 0.2:
+                board.motor_movement([2], board.CCW, abs(maxPWM*Right))
+                # print(f"Right value: {Right}")
+            elif Right > 0.2:
+                board.motor_movement([2], board.CW, maxPWM*Right)
+                # print(f"Right value: {Right}")
+            else:
+                board.motor_stop([2])
+                
+            if Left < (-0.2):
+                board.motor_movement([1], board.CCW, abs(maxPWM*Left))
+                # print(f"Left value: {Left}")
+            elif Left > 0.2:
+                board.motor_movement([1], board.CW, maxPWM*Left)
+                # print(f"Left value: {Left}")
+            else:
+                board.motor_stop([1])
+
+
+        if event.type == pygame.JOYHATMOTION: # Hat Action
+            hat_x, hat_y = event.value
+
+            if hat_x > 0: # Press right
+                if hat_y == 1: # Right and Up
+                    print("Right and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Right and Down -DPAD")
+                if hat_y == 0:
+                    print("Right          -DPAD")
+                    
+
+            if hat_x == 0:
+                if hat_y == 1: # Up
+                    print("Up             -DPAD")
+                if hat_y == -1: # Down
+                    print("Down           -DPAD")
+                
+                
+            if hat_x < 0:
+                if hat_y == 1: # Left and Up
+                    print("Left and Up   -DPAD")
+                if hat_y == -1: # Right and Down
+                    print("Left and Down -DPAD")
+                if hat_y == 0:
+                    print("Left          -DPAD")
+    
+    currentTime = monotonic()
