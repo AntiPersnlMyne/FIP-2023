@@ -23,55 +23,8 @@ import sys
 from picamera2 import Picamera2, MappedArray
 
 # debuggery
-import pprint
+from pprint import pprint
 import inspect
-
-# comms
-from base64 import encode
-
-
-# remapper
-
-class Calibration():
-    """Arena calibration, p = pixels, m = meat space"""
-    p1 = (0,0)
-    p2 = (0,0)
-    p3 = (0,0)
-
-    m1 = (0,0)
-    m2 = (0,0)
-    m3 = (0,0)
-
-    def __init__(self, p1, p2, p3, m1, m2, m3) -> None:
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-
-        self.m1 = m1
-        self.m2 = m2
-        self.m3 = m3
-
-        # pass
-
-    def set(self, p1, p2, p3, m1, m2, m3):
-        self.p1 = p1
-        self.p2 = p2
-        self.p3 = p3
-
-        self.m1 = m1
-        self.m2 = m2
-        self.m3 = m3
-
-    def transform(self, p):
-        """Transform from pixels to meat space"""
-        # TODO
-        return p
-    
-    def inverse(self, m):
-        """Transform from meat space to pixels"""
-        # TODO
-        return m   
-    
 
 ## Robot state
 
@@ -101,30 +54,6 @@ class Robot():
     
     def delta(self):
         return self.bx - self.lastx, self.by - self.lasty
-
-
-# class RobotThread(threading.Thread):
-#     """Robot detection thread"""
-
-#     def __init__(self):
-#         threading.Thread.__init__(self)
-#         #initialize camera
-#         print("Robot Thread initialized")
-
-#     def findRobot(self):
-#         #find x y of robots
-#         global rOtto, rManuel
-        
-#         #curx, cury = rOtto.get()
-#         #print(curx, cury)
-#         #rOtto.set(curx+(0.1*(random.random()-0.5)), cury+(0.1*(random.random()-0.5)))
-
-    
-#     def run(self):
-#         #calls find ball over and over
-#         print("Robot thread go")
-#         while True:
-#             self.findRobot()
   
 
 # blobber
@@ -144,9 +73,9 @@ def setup_blob():
     params.blobColor = 255
 
     # Filter by Area.
-    params.filterByArea = True
-    params.minArea = 5
-    params.maxArea = 500
+    params.filterByArea = False
+    params.minArea = 3
+    params.maxArea = 100
 
     # Filter by Circularity
     params.filterByCircularity = False
@@ -163,18 +92,34 @@ def setup_blob():
     # Create a detector with the parameters
     detector = cv2.SimpleBlobDetector.create(params)
 
+ddt = 0
 
 def track(request):
     """Tracker Callback"""
-    global detector, rOtto
-    
-    with MappedArray(request, "main") as m:
-        # print(m.array.shape)
-        keypoints = detector.detect(m.array)
+    global detector, rOtto, rManuel
+    global ddt, dtx
 
-        for k in keypoints:
-            # pprint.pprint((k.pt, k.size))
-            rOtto.set(k.pt[0],k.pt[1])
+    t0 = time.time()
+
+    with MappedArray(request, "lores") as m:
+
+        k = detector.detect(m.array)
+
+        if len(k) > 0:
+            # pprint(k[0].pt)
+
+            # if k[0].size > k[1].size:
+            rOtto.set(k[0].pt[0],k[0].pt[1])
+            #     rManuel.set(k[1].pt[0],k[1].pt[1])
+            # else:
+            #     rManuel.set(k[0].pt[0],k[0].pt[1])
+            #     rOtto.set(k[1].pt[0],k[1].pt[1])              
+
+    # dt = time.time() - t0
+    # ddt = (ddt + dt) / 2.0
+    # print(1/ddt)
+
+        
 
 
 def setup_camera():
@@ -184,17 +129,20 @@ def setup_camera():
 
     tuning = Picamera2.load_tuning_file("imx519.json")
 
-    # algo = Picamera2.find_tuning_algo(tuning, "rpi.agc")
-    # algo["exposure_modes"]["normal"] = {"shutter": [100, 66666], "gain": [1.0, 8.0]}
-    # picam2 = Picamera2(tuning=tuning)
+    #algo = Picamera2.find_tuning_algo(tuning, "rpi.agc")
+    #algo["exposure_modes"]["normal"] = {"shutter": [100, 66666], "gain": [1.0, 8.0]}
+    
+    #picam2 = Picamera2(tuning=tuning)
 
     # create camera instance
     picam2 = Picamera2()
-    video_config = picam2.create_video_configuration(main={"size": (1280,720), "format": "RGB888"})
+    video_config = picam2.create_video_configuration(main={"size": (2328,1748), "format": "RGB888"},
+                                                     lores={"size": (640,480), "format": "YUV420"})
 
+    # video_config = picam2.create_video_configuration(main={"size": (1280,720), "format": "RGB888"})
 
     picam2.configure(video_config)
-    picam2.set_controls({"ExposureTime": 10, "AnalogueGain": 1600})
+    picam2.set_controls({"AnalogueGain": 10.0})
 
     # set the callback
     picam2.pre_callback = track
@@ -206,24 +154,28 @@ def setup_camera():
 
 
 
-
 class MyTCPHandler(socketserver.BaseRequestHandler):
     """from the socketserver docs"""
     def handle(self):
         
         global server
-        global rOtto
+        global rOtto, rManuel
 
         while True:
             # self.request is the TCP socket connected to the client
             self.data = self.request.recv(1024).strip()
             # print("{} wrote:".format(self.client_address[0]))
-            # print(self.data)
-            if self.data == b'getloc':
+            print(self.data)
+
+            if self.data == b'getotto':
                 posx, posy = rOtto.get()
-                message = bytes('%.3f' % posx+','+ '%.3f' % posy,'UTF-8')
-                self.request.sendall(message)
-                print("sent",message)
+            elif self.data == b'getmanuel':
+                posx, posy = rManuel.get()
+            elif self.data == b'getdotto':
+                posx, posy = rOtto.delta()
+            elif self.data == b'getdmanuel':
+                posx, posy = rManuel.delta()
+            
             elif self.data == b'done' or self.data == b'':
                 self.request.sendall(b"quitting")
                 # print("quitting")
@@ -232,24 +184,23 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 server.shutdown()
             else:
                 # print("unknown message")
-                pass
+                return
 
-        # encoding example    
-        # thesx=str(ppp[0])+','+str(ppp[1])
-        # self.request.sendall(bytearray(thesx.encode()))
-        # #time.sleep(.1)
-        # fieldnames = [ 'X', 'Y' ]      
+            message = bytes('%.3f' % posx+','+ '%.3f' % posy,'UTF-8')
+            self.request.sendall(message)
+            # print("sent",message)
+   
 
 if __name__=="__main__":
 
     # global robots
-    rOtto = Robot(300.0*random.random(), 200.0*random.random())
-    rManuel = Robot(300.0*random.random(), 200.0*random.random())
+    rOtto = Robot(0., 0.)
+    rManuel = Robot(0., 0.)
     
     # calibration
     # pixel space (right now in col,row space) then meat space (in cm right now)        
-    cal = Calibration((0.0, 480.0), (640.0, 480.0), (0.0, 0.0),
-                      (0.0, 0.0), (300.0, 0.0), (0.0, 200.0))
+    # cal = Calibration((0.0, 480.0), (640.0, 480.0), (0.0, 0.0),
+    #                   (0.0, 0.0), (300.0, 0.0), (0.0, 200.0))
     
     # tracker
     setup_blob()
